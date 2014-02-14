@@ -12,32 +12,7 @@
  *   GPL v3 http://opensource.org/licenses/GPL-3.0
  *
  */
-(function (root, factory) {
-    // https://github.com/umdjs/umd/blob/master/returnExports.js
-    if (typeof exports === 'object') {
-        // Node
-        module.exports = factory();
-    } else if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
-        define(factory);
-    } else {
-        // Browser globals (root is window)
-        root.IPv6 = factory(root);
-    }
-}(this, function (root) {
-"use strict";
-
-/*
-var _in = "fe80:0000:0000:0000:0204:61ff:fe9d:f156";
-var _out = IPv6.best(_in);
-var _expected = "fe80::204:61ff:fe9d:f156";
-
-console.log(_in, _out, _expected, _out === _expected);
-*/
-
-// save current IPv6 variable, if any
-var _IPv6 = root && root.IPv6;
-
+define(function (require, exports, module) {
 function best(address) {
     // based on:
     // Javascript to test an IPv6 address for proper format, and to
@@ -170,16 +145,7 @@ function best(address) {
     return result;
 };
 
-function noConflict(){
-    if (root.IPv6 === this) {
-        root.IPv6 = _IPv6;
-    }
-    
-    return this;
-};
-
 return {
-    best: best,
-    noConflict: noConflict
+    best: best
 };
-}));
+});

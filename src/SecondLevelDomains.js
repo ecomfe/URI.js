@@ -12,25 +12,7 @@
  *   GPL v3 http://opensource.org/licenses/GPL-3.0
  *
  */
-
-(function (root, factory) {
-    // https://github.com/umdjs/umd/blob/master/returnExports.js
-    if (typeof exports === 'object') {
-        // Node
-        module.exports = factory();
-    } else if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
-        define(factory);
-    } else {
-        // Browser globals (root is window)
-        root.SecondLevelDomains = factory(root);
-    }
-}(this, function (root) {
-"use strict";
-
-// save current SecondLevelDomains variable, if any
-var _SecondLevelDomains = root && root.SecondLevelDomains;
-
+define(function (require, exports, module) {
 var hasOwn = Object.prototype.hasOwnProperty;
 var SLD = {
     // list of known Second Level Domains
@@ -191,12 +173,6 @@ var SLD = {
         var t = domain.match(SLD.has_expression);
         return t && t[1] || null;
     },
-    noConflict: function(){
-      if (root.SecondLevelDomains === this) {
-        root.SecondLevelDomains = _SecondLevelDomains;
-      }
-      return this;
-    },
     init: function() {
         var t = '';
         for (var tld in SLD.list) {
@@ -217,4 +193,4 @@ var SLD = {
 SLD.init();
 
 return SLD;
-}));
+});

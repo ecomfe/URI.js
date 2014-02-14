@@ -11,23 +11,10 @@
  *   GPL v3 http://opensource.org/licenses/GPL-3.0
  *
  */
-(function (root, factory) {
-    // https://github.com/umdjs/umd/blob/master/returnExports.js
-    if (typeof exports === 'object') {
-        // Node
-        module.exports = factory(require('./punycode'), require('./IPv6'), require('./SecondLevelDomains'));
-    } else if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
-        define(['./punycode', './IPv6', './SecondLevelDomains'], factory);
-    } else {
-        // Browser globals (root is window)
-        root.URI = factory(root.punycode, root.IPv6, root.SecondLevelDomains, root);
-    }
-}(this, function (punycode, IPv6, SLD, root) {
-"use strict";
-
-// save current URI variable, if any
-var _URI = root && root.URI;
+define(function(require, exports, module){
+var punycode = require('./punycode');
+var IPv6 = require('./IPv6');
+var SLD = require('./SecondLevelDomains');
 
 function URI(url, base) {
     // Allow instantiation without the 'new' keyword
@@ -101,7 +88,7 @@ function filterArrayValues(data, value) {
 
 function arrayContains(list, value) {
     var i, length;
-    
+
     // value may be string, number, array, regexp
     if (isArray(value)) {
         // Note: this can be optimized to O(n) (instead of current O(m * n))
@@ -110,10 +97,10 @@ function arrayContains(list, value) {
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     var _type = getType(value);
     for (i = 0, length = list.length; i < length; i++) {
         if (_type === 'RegExp') {
@@ -132,7 +119,7 @@ function arraysEqual(one, two) {
     if (!isArray(one) || !isArray(two)) {
         return false;
     }
-    
+
     // arrays can't be equal if they have different amount of content
     if (one.length !== two.length) {
         return false;
@@ -146,7 +133,7 @@ function arraysEqual(one, two) {
             return false;
         }
     }
-    
+
     return true;
 }
 
@@ -227,13 +214,13 @@ URI.getDomAttribute = function(node) {
     if (!node || !node.nodeName) {
         return undefined;
     }
-    
+
     var nodeName = node.nodeName.toLowerCase();
     // <input> should only expose src for type="image"
     if (nodeName === 'input' && node.type !== 'image') {
         return undefined;
     }
-    
+
     return URI.domAttributes[nodeName];
 };
 
@@ -465,8 +452,8 @@ URI.parseAuthority = function(string, parts) {
 URI.parseUserinfo = function(string, parts) {
     // extract username:password
     var firstSlash = string.indexOf('/');
-    var pos = firstSlash > -1 
-        ? string.lastIndexOf('@', firstSlash) 
+    var pos = firstSlash > -1
+        ? string.lastIndexOf('@', firstSlash)
         : string.indexOf('@');
     var t;
 
@@ -652,7 +639,7 @@ URI.addQuery = function(data, name, value) {
 };
 URI.removeQuery = function(data, name, value) {
     var i, length, key;
-    
+
     if (isArray(name)) {
         for (i = 0, length = name.length; i < length; i++) {
             data[name[i]] = undefined;
@@ -686,7 +673,7 @@ URI.hasQuery = function(data, name, value, withinArray) {
                 }
             }
         }
-        
+
         return true;
     } else if (typeof name !== "string") {
         throw new TypeError("URI.hasQuery() accepts an object, string as the name parameter");
@@ -760,7 +747,7 @@ URI.commonPath = function(one, two) {
     if (pos < 1) {
         return one.charAt(0) === two.charAt(0) && one.charAt(0) === '/' ? '/' : '';
     }
-    
+
     // revert to last /
     if (one.charAt(pos) !== '/' || two.charAt(pos) !== '/') {
         pos = one.substring(0, pos).lastIndexOf('/');
@@ -782,7 +769,7 @@ URI.withinString = function(string, callback, options) {
         if (!match) {
             break;
         }
-        
+
         var start = match.index;
         if (options.ignoreHtml) {
             // attribut(e=["']?$)
@@ -791,13 +778,13 @@ URI.withinString = function(string, callback, options) {
                 continue;
             }
         }
-        
+
         var end = start + string.slice(start).search(_end);
         var slice = string.slice(start, end).replace(_trim, '');
         if (options.ignore && options.ignore.test(slice)) {
             continue;
         }
-        
+
         end = start + slice.length;
         var result = callback(slice, start, end, string);
         string = string.slice(0, start) + result + string.slice(end);
@@ -822,33 +809,6 @@ URI.ensureValidHostname = function(v) {
             throw new TypeError("Hostname '" + v + "' contains characters other than [A-Z0-9.-]");
         }
     }
-};
-
-// noConflict
-URI.noConflict = function(removeAll) {
-    if (removeAll) {
-        var unconflicted = {
-            URI: this.noConflict()
-        };
-
-        if (URITemplate && typeof URITemplate.noConflict == "function") {
-            unconflicted.URITemplate = URITemplate.noConflict();
-        }
-
-        if (IPv6 && typeof IPv6.noConflict == "function") {
-            unconflicted.IPv6 = IPv6.noConflict();
-        }
-
-        if (SecondLevelDomains && typeof SecondLevelDomains.noConflict == "function") {
-            unconflicted.SecondLevelDomains = SecondLevelDomains.noConflict();
-        }
-
-        return unconflicted;
-    } else if (root.URI === this) {
-        root.URI = _URI;
-    }
-
-    return this;
 };
 
 p.build = function(deferBuild) {
@@ -884,7 +844,7 @@ generateAccessor = function(_part){
     };
 };
 
-for (_part in _parts) {                                                                                                                                                                                        
+for (_part in _parts) {
     p[_part] = generateAccessor(_parts[_part]);
 }
 
@@ -939,7 +899,7 @@ p.pathname = function(v, build) {
 p.path = p.pathname;
 p.href = function(href, build) {
     var key;
-    
+
     if (href === undefined) {
         return this.toString();
     }
@@ -954,13 +914,13 @@ p.href = function(href, build) {
         href = href[attribute] || "";
         _object = false;
     }
-    
+
     // window.location is reported to be an object, but it's not the sort
-    // of object we're looking for: 
+    // of object we're looking for:
     // * location.protocol ends with a colon
     // * location.query != object.search
     // * location.hash != object.fragment
-    // simply serializing the unknown object should do the trick 
+    // simply serializing the unknown object should do the trick
     // (for location, not for everything...)
     if (!_URI && _object && href.pathname !== undefined) {
         href = href.toString();
@@ -1155,11 +1115,11 @@ p.userinfo = function(v, build) {
 };
 p.resource = function(v, build) {
     var parts;
-    
+
     if (v === undefined) {
         return this.path() + this.search() + this.hash();
     }
-    
+
     parts = URI.parse(v);
     this._parts.path = parts.path;
     this._parts.query = parts.query;
@@ -1271,7 +1231,7 @@ p.tld = function(v, build) {
         return tld;
     } else {
         var replace;
-        
+
         if (!v) {
             throw new TypeError("cannot set TLD empty");
         } else if (v.match(/[^a-zA-Z0-9-]/)) {
@@ -1354,7 +1314,7 @@ p.filename = function(v, build) {
         return v ? URI.decodePathSegment(res) : res;
     } else {
         var mutatedDirectory = false;
-        
+
         if (v.charAt(0) === '/') {
             v = v.substring(1);
         }
@@ -1464,11 +1424,11 @@ p.segment = function(segment, v, build) {
                 if (!v[i].length && (!segments.length || !segments[segments.length -1].length)) {
                     continue;
                 }
-                
+
                 if (segments.length && !segments[segments.length -1].length) {
                     segments.pop();
                 }
-                
+
                 segments.push(v[i]);
             }
         } else if (v || (typeof v === "string")) {
@@ -1548,7 +1508,7 @@ p.query = function(v, build) {
 };
 p.setQuery = function(name, value, build) {
     var data = URI.parseQuery(this._parts.query, this._parts.escapeQuerySpace);
-    
+
     if (typeof name === "object") {
         for (var key in name) {
             if (hasOwn.call(name, key)) {
@@ -1560,7 +1520,7 @@ p.setQuery = function(name, value, build) {
     } else {
         throw new TypeError("URI.addQuery() accepts an object, string as the name parameter");
     }
-    
+
     this._parts.query = URI.buildQuery(data, this._parts.duplicateQueryParameters, this._parts.escapeQuerySpace);
     if (typeof name !== "string") {
         build = value;
@@ -1820,11 +1780,11 @@ p.absoluteTo = function(base) {
     if (!(base instanceof URI)) {
         base = new URI(base);
     }
-    
+
     if (!resolved._parts.protocol) {
         resolved._parts.protocol = base._parts.protocol;
     }
-    
+
     if (this._parts.hostname) {
         return resolved;
     }
@@ -1832,7 +1792,7 @@ p.absoluteTo = function(base) {
     for (i = 0; p = properties[i]; i++) {
         resolved._parts[p] = base._parts[p];
     }
-    
+
     if (!resolved._parts.path) {
         resolved._parts.path = base._parts.path;
         if (!resolved._parts.query) {
@@ -1841,7 +1801,7 @@ p.absoluteTo = function(base) {
     } else if (resolved._parts.path.substring(-2) === '..') {
         resolved._parts.path += '/';
     }
-    
+
     if (resolved.path().charAt(0) !== '/') {
         basedir = base.directory();
         resolved._parts.path = (basedir ? (basedir + '/') : '') + resolved._parts.path;
@@ -1896,7 +1856,7 @@ p.relativeTo = function(base) {
         relativeParts.path = '';
         return relative.build();
     }
-    
+
     // determine common sub path
     common = URI.commonPath(relative.path(), base.path());
 
@@ -1989,4 +1949,4 @@ p.escapeQuerySpace = function(v) {
 };
 
 return URI;
-}));
+});

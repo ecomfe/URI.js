@@ -1,6 +1,9 @@
-(function(){
+define(function(require){
+var URI = require('../../src/URI');
+
+function run() {
 test("loaded", function() {
-    ok(window.URI);
+    ok(URI);
 });
 
 module("constructing");
@@ -1383,38 +1386,6 @@ test("withinString - ignoreHtml", function() {
 
     equal(result, expected, "filtered in string URI identification");
 });
-test("noConflict", function() {
-    var actual_lib = URI; // actual library; after loading, before noConflict()
-    var unconflicted = URI.noConflict();
-
-    strictEqual( unconflicted, actual_lib, "noConflict() returns the URI object" );
-    strictEqual( URI, URI_pre_lib, "noConflict() restores the `URI` variable" );
-
-    // restore for other tests
-    window.URI = actual_lib;
-});
-test("noConflict(removeAll=true)", function() {
-    var actual = {
-        URI:                URI,
-        URITemplate:        URITemplate,
-        IPv6:               IPv6,
-        SecondLevelDomains: SecondLevelDomains
-    };
-
-    var unconflicted = URI.noConflict(true);
-
-    deepEqual( unconflicted, actual, "noConflict(true) returns the { URI, URITemplate, IPv6, SecondLevelDomains } object" );
-    strictEqual( URI,                URI_pre_lib,                "noConflict(true) restores the `URI` variable" );
-    strictEqual( URITemplate,        URITemplate_pre_lib,        "noConflict(true) restores the `URITemplate` variable" );
-    strictEqual( IPv6,               IPv6_pre_lib,               "noConflict(true) restores the `IPv6` variable" );
-    strictEqual( SecondLevelDomains, SecondLevelDomains_pre_lib, "noConflict(true) restores the `SecondLevelDomains` variable" );
-
-    // restore for other tests
-    window.URI                = actual.URI;
-    window.URITemplate        = actual.URITemplate;
-    window.IPv6               = actual.IPv6;
-    window.SecondLevelDomains = actual.SecondLevelDomains;
-});
 
 module("comparing URLs");
 test("equals", function() {
@@ -1490,4 +1461,7 @@ module("Encoding");
 test("encodeReserved", function() {
     equal(URI.encodeReserved("ä:/?#[]@!$&'()*+,;="), "%C3%A4:/?#[]@!$&'()*+,;=");
 });
-})();
+}
+
+return { run: run }
+});
